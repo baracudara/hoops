@@ -1,0 +1,91 @@
+syntax = "proto3"; 
+
+package auth;
+
+option go_package = "";
+
+service Auth {
+    rpc Register (RegisterRequest) returns (RegisterResponse); 
+    rpc Login (LoginRequest) returns (LoginResponse); 
+    rpc Logout (LogoutRequest) returns (LogoutResponse);
+    rpc GuestLogin (GuestLoginRequest) returns (GuestLoginResponse); 
+    rpc SendOTP(SendOTPRequest) returns (SendOTPResponse);
+    rpc VerifyToken(VerifyTokenRequest) returns (VerifyTokenResponse);
+}
+
+
+message RegisterRequest {
+    oneof auth_method {
+        Email email = 1;
+        Phone phone = 2; 
+        string google_id = 3;
+    }
+    string name = 4;
+    string nickname = 5;
+}
+
+message RegisterResponse {
+    string token = 1; 
+}
+
+message LoginRequest {
+    oneof auth_method {
+        Email email = 1;
+        Phone phone = 2; 
+        string google_id = 3;
+    }
+    int32 app_id = 5;
+
+}
+
+message LoginResponse {
+    string token = 1;
+}
+
+message LogoutRequest {
+    string token = 1;
+}
+
+message LogoutResponse {
+    bool success = 1;
+}
+
+message GuestLoginRequest {
+    string name = 1;
+}
+
+message GuestLoginResponse {
+    string token = 1;
+}
+
+
+message SendOTPRequest {
+  string phone = 1;
+}
+
+message SendOTPResponse {
+  bool is_sent = 1;
+}
+
+
+message VerifyTokenRequest {
+    string token = 1;
+}
+
+message VerifyTokenResponse {
+    string uuid = 1; 
+    string role = 2;
+    bool is_guest = 3;
+    bool valid = 4;
+}
+
+message Email { 
+    string email = 1; 
+    string password = 2;
+}
+
+message Phone { 
+    string phone = 1; 
+    string otp_code = 2;
+}
+
