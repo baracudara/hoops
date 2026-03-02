@@ -19,12 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Auth_Register_FullMethodName    = "/auth.Auth/Register"
-	Auth_Login_FullMethodName       = "/auth.Auth/Login"
-	Auth_Logout_FullMethodName      = "/auth.Auth/Logout"
-	Auth_GuestLogin_FullMethodName  = "/auth.Auth/GuestLogin"
-	Auth_SendOTP_FullMethodName     = "/auth.Auth/SendOTP"
-	Auth_VerifyToken_FullMethodName = "/auth.Auth/VerifyToken"
+	Auth_Register_FullMethodName           = "/auth.Auth/Register"
+	Auth_Login_FullMethodName              = "/auth.Auth/Login"
+	Auth_Logout_FullMethodName             = "/auth.Auth/Logout"
+	Auth_GuestLogin_FullMethodName         = "/auth.Auth/GuestLogin"
+	Auth_SendOTP_FullMethodName            = "/auth.Auth/SendOTP"
+	Auth_VerifyAccessToken_FullMethodName  = "/auth.Auth/VerifyAccessToken"
+	Auth_VerifyRefreshToken_FullMethodName = "/auth.Auth/VerifyRefreshToken"
 )
 
 // AuthClient is the client API for Auth service.
@@ -36,7 +37,8 @@ type AuthClient interface {
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
 	GuestLogin(ctx context.Context, in *GuestLoginRequest, opts ...grpc.CallOption) (*GuestLoginResponse, error)
 	SendOTP(ctx context.Context, in *SendOTPRequest, opts ...grpc.CallOption) (*SendOTPResponse, error)
-	VerifyToken(ctx context.Context, in *VerifyTokenRequest, opts ...grpc.CallOption) (*VerifyTokenResponse, error)
+	VerifyAccessToken(ctx context.Context, in *VerifyAccessTokenRequest, opts ...grpc.CallOption) (*VerifyAccessTokenResponse, error)
+	VerifyRefreshToken(ctx context.Context, in *VerifyRefreshTokenRequest, opts ...grpc.CallOption) (*VerifyRefreshTokenResponse, error)
 }
 
 type authClient struct {
@@ -97,10 +99,20 @@ func (c *authClient) SendOTP(ctx context.Context, in *SendOTPRequest, opts ...gr
 	return out, nil
 }
 
-func (c *authClient) VerifyToken(ctx context.Context, in *VerifyTokenRequest, opts ...grpc.CallOption) (*VerifyTokenResponse, error) {
+func (c *authClient) VerifyAccessToken(ctx context.Context, in *VerifyAccessTokenRequest, opts ...grpc.CallOption) (*VerifyAccessTokenResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(VerifyTokenResponse)
-	err := c.cc.Invoke(ctx, Auth_VerifyToken_FullMethodName, in, out, cOpts...)
+	out := new(VerifyAccessTokenResponse)
+	err := c.cc.Invoke(ctx, Auth_VerifyAccessToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authClient) VerifyRefreshToken(ctx context.Context, in *VerifyRefreshTokenRequest, opts ...grpc.CallOption) (*VerifyRefreshTokenResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(VerifyRefreshTokenResponse)
+	err := c.cc.Invoke(ctx, Auth_VerifyRefreshToken_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +128,8 @@ type AuthServer interface {
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
 	GuestLogin(context.Context, *GuestLoginRequest) (*GuestLoginResponse, error)
 	SendOTP(context.Context, *SendOTPRequest) (*SendOTPResponse, error)
-	VerifyToken(context.Context, *VerifyTokenRequest) (*VerifyTokenResponse, error)
+	VerifyAccessToken(context.Context, *VerifyAccessTokenRequest) (*VerifyAccessTokenResponse, error)
+	VerifyRefreshToken(context.Context, *VerifyRefreshTokenRequest) (*VerifyRefreshTokenResponse, error)
 	mustEmbedUnimplementedAuthServer()
 }
 
@@ -142,8 +155,11 @@ func (UnimplementedAuthServer) GuestLogin(context.Context, *GuestLoginRequest) (
 func (UnimplementedAuthServer) SendOTP(context.Context, *SendOTPRequest) (*SendOTPResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SendOTP not implemented")
 }
-func (UnimplementedAuthServer) VerifyToken(context.Context, *VerifyTokenRequest) (*VerifyTokenResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method VerifyToken not implemented")
+func (UnimplementedAuthServer) VerifyAccessToken(context.Context, *VerifyAccessTokenRequest) (*VerifyAccessTokenResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method VerifyAccessToken not implemented")
+}
+func (UnimplementedAuthServer) VerifyRefreshToken(context.Context, *VerifyRefreshTokenRequest) (*VerifyRefreshTokenResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method VerifyRefreshToken not implemented")
 }
 func (UnimplementedAuthServer) mustEmbedUnimplementedAuthServer() {}
 func (UnimplementedAuthServer) testEmbeddedByValue()              {}
@@ -256,20 +272,38 @@ func _Auth_SendOTP_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Auth_VerifyToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(VerifyTokenRequest)
+func _Auth_VerifyAccessToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyAccessTokenRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServer).VerifyToken(ctx, in)
+		return srv.(AuthServer).VerifyAccessToken(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Auth_VerifyToken_FullMethodName,
+		FullMethod: Auth_VerifyAccessToken_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServer).VerifyToken(ctx, req.(*VerifyTokenRequest))
+		return srv.(AuthServer).VerifyAccessToken(ctx, req.(*VerifyAccessTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Auth_VerifyRefreshToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyRefreshTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).VerifyRefreshToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Auth_VerifyRefreshToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).VerifyRefreshToken(ctx, req.(*VerifyRefreshTokenRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -302,8 +336,12 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Auth_SendOTP_Handler,
 		},
 		{
-			MethodName: "VerifyToken",
-			Handler:    _Auth_VerifyToken_Handler,
+			MethodName: "VerifyAccessToken",
+			Handler:    _Auth_VerifyAccessToken_Handler,
+		},
+		{
+			MethodName: "VerifyRefreshToken",
+			Handler:    _Auth_VerifyRefreshToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

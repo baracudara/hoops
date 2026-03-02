@@ -10,7 +10,9 @@ service Auth {
     rpc Logout (LogoutRequest) returns (LogoutResponse);
     rpc GuestLogin (GuestLoginRequest) returns (GuestLoginResponse); 
     rpc SendOTP(SendOTPRequest) returns (SendOTPResponse);
-    rpc VerifyToken(VerifyTokenRequest) returns (VerifyTokenResponse);
+    rpc VerifyAccessToken(VerifyAccessTokenRequest) returns (VerifyAccessTokenResponse);
+    rpc VerifyRefreshToken(VerifyRefreshTokenRequest) returns (VerifyRefreshTokenResponse);
+
 }
 
 
@@ -25,7 +27,8 @@ message RegisterRequest {
 }
 
 message RegisterResponse {
-    string token = 1; 
+    string access_token = 1;
+    string refresh_token = 2;
 }
 
 message LoginRequest {
@@ -39,7 +42,8 @@ message LoginRequest {
 }
 
 message LoginResponse {
-    string token = 1;
+    string access_token = 1;
+    string refresh_token = 2;
 }
 
 message LogoutRequest {
@@ -68,15 +72,21 @@ message SendOTPResponse {
 }
 
 
-message VerifyTokenRequest {
-    string token = 1;
+message VerifyAccessTokenRequest {
+    string access_token = 1;
+}
+message VerifyAccessTokenResponse {
+    string uuid = 1;
+    string role = 2;
+    bool valid = 3;
 }
 
-message VerifyTokenResponse {
-    string uuid = 1; 
-    string role = 2;
-    bool is_guest = 3;
-    bool valid = 4;
+message VerifyRefreshTokenRequest {
+    string refresh_token = 1;
+}
+
+message VerifyRefreshTokenResponse {
+    bool valid = 1;
 }
 
 message Email { 
