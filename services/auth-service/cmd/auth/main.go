@@ -33,6 +33,11 @@ func main() {
 
 	<-stop
 
+
+
+
+
+	
 	application.GRPSServer.Stop()
 	log.Info("Gracefully stopped")
 }
