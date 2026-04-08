@@ -1,0 +1,22 @@
+# Config files with secrets
+services/auth-service/config/local.yaml
+
+# Go binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+
+# Go test cache
+*.test
+*.out
+
+# Environment files
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
