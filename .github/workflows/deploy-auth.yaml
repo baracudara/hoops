@@ -47,7 +47,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: root
           key: ${{ secrets.DEPLOY_SSH_KEY }}
-          source: "docker-compose.prod.yml"
+          source: "docker-compose.prod.yaml"
           target: "/root/apps/hoops/"
 
       - name: Deploy on server
