@@ -2,8 +2,11 @@ FROM golang:1.25-alpine AS builder
 
 WORKDIR /app
 
-# Копируем корневой go.mod для replace directive
+# Копируем корневой go.mod
 COPY go.mod go.sum ./
+
+# Копируем protos — auth-service зависит от них
+COPY protos ./protos
 
 # Копируем auth-service
 COPY services/auth-service ./services/auth-service
