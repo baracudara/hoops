@@ -5,6 +5,10 @@ on:
     branches: [main]
     paths:
       - 'services/auth-service/**'
+      
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   build-and-push:
