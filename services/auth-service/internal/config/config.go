@@ -72,6 +72,8 @@ func FetchConfig(cfgPath string) *Config {
 
 }
 
+
+
 func fetchConfigPath() string {
 	var cfgPath string
 

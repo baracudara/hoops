@@ -21,6 +21,7 @@ FROM alpine:latest
 WORKDIR /app
 
 COPY --from=builder /app/auth-server .
+COPY services/auth-service/config/prod.yaml /app/config/prod.yaml
 
 EXPOSE 44044
 

@@ -19,6 +19,7 @@ services:
   auth-service:
     image: ghcr.io/baracudara/hoops/auth-service:latest
     restart: always
+    command: ["./auth-server", "--config=/app/config/prod.yaml"]
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
