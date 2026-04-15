@@ -24,7 +24,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: services/auth-service
+          context: .                                   
+          file: services/auth-service/Dockerfile      
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/hoops/auth-service:latest
 
