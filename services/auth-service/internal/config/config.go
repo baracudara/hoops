@@ -18,9 +18,6 @@ type Config struct {
 
 
 
-
-
-
 type Postgres struct {
 	Host     string `yaml:"host" env-default:"localhost"`
 	Port     int    `yaml:"port" env-default:"5432"`
