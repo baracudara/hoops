@@ -16,6 +16,8 @@ type Config struct {
 	JWT      `yaml:"jwt"`
 }
 
+
+
 type Postgres struct {
 	Host     string `yaml:"host" env-default:"localhost"`
 	Port     int    `yaml:"port" env-default:"5432"`
