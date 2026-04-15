@@ -20,7 +20,7 @@ type Postgres struct {
 	Host     string `yaml:"host" env-default:"localhost"`
 	Port     int    `yaml:"port" env-default:"5432"`
 	User     string `yaml:"user" env-default:"root"`
-	Password string `yaml:"password" env-default:"qwerty"`
+	Password string `yaml:"password" env:"POSTGRES_PASSWORD" env-default:"qwerty"`
 	DBName   string `yaml:"dbname" env-default:"auth"`
 	MinConns int32  `yaml:"min_conns" env-default:"2"`
 	MaxConns int32  `yaml:"max_conns" env-default:"10"`
@@ -30,14 +30,14 @@ type Redis struct {
 	Host     string `yaml:"host" env-default:"localhost"`
 	Port     int    `yaml:"port" env-default:"6379"`
 	User     string `yaml:"username"`
-	Password string `yaml:"password" env-default:"qwerty"`
+	Password string `yaml:"password" env:"REDIS_PASSWORD" env-default:"qwerty"`
 	DB       int    `yaml:"db" env-default:"0"`
 }
 
 type JWT struct {
-	Secret          string        `yaml:"secret"`
+	Secret          string        `yaml:"secret" env:"JWT_SECRET"`
 	AccessTokenTTL  time.Duration `yaml:"access_token_ttl" env-default:"15m"`
-	RefreshTokenTTL time.Duration `yaml:"refresh_token_ttl" env-default:"240h"` 
+	RefreshTokenTTL time.Duration `yaml:"refresh_token_ttl" env-default:"240h"`
 }
 
 type GRPC struct {

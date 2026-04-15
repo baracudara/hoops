@@ -1,5 +1,4 @@
-name: Deploy Auth Service 
-
+name: Deploy Auth Service
 
 on:
   push:
@@ -7,42 +6,55 @@ on:
     paths:
       - 'services/auth-service/**'
 
-
 jobs:
-  deploy:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          go-version: '1.23'
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build auth service
-        working-directory: services/auth-service
-        run: |
-          go mod download
-          go build -o auth-server ./cmd/auth
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: services/auth-service
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/hoops/auth-service:latest
 
-      - name: Copy binary to server
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Copy docker-compose to server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: root
           key: ${{ secrets.DEPLOY_SSH_KEY }}
-          source: "services/auth-service/auth-server"
-          target: "/root/apps/auth-service/"
-          strip_components: 2
+          source: "docker-compose.prod.yml"
+          target: "/root/apps/hoops/"
 
-      - name: Restart service
+      - name: Deploy on server
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: root
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
-            systemctl restart auth-service
-            systemctl status auth-service
+            cd /root/apps/hoops
+            export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+            export REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+            export JWT_SECRET=${{ secrets.JWT_SECRET }}
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d
