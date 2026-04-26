@@ -1,0 +1,12 @@
+env: local
+
+http:
+  port: 8080
+  timeout: 5s
+  cookie_domain: localhost
+  refresh_token_ttl: 720h
+
+auth_grpc:
+  host: localhost
+  port: 44044
+  timeout: 5s

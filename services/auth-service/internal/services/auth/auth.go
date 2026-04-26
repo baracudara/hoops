@@ -253,10 +253,73 @@ func (a *Auth) VerifyAccessToken(ctx context.Context, accessToken string) (model
         return models.User{}, fmt.Errorf("%s: invalid token", op)
     }
 
-    claims := token.Claims.(*jwt.MapClaims)
-    
-    return models.User{
-        ID:   (*claims)["uuid"].(string),
-        Role: models.Role((*claims)["role"].(string)),
-    }, nil
+	claims := token.Claims.(jwt.MapClaims)
+
+	return models.User{
+		ID:   claims["uuid"].(string),
+		Role: models.Role(claims["role"].(string)),
+	}, nil
 }
+
+
+
+func (a *Auth) Refresh(ctx context.Context, refreshToken string) (string, string, error) {
+    const op = "services.auth.refresh"
+
+    log := a.log.With(slog.String("op", op))
+    log.Info("refreshing tokens")
+
+    // проверяем что refresh token есть в Redis
+    valid, err := a.tokenChecker.IsTokenValid(ctx, refreshToken)
+    if err != nil {
+        log.Error("failed to check token", sl.Err(err))
+        return "", "", fmt.Errorf("%s: %w", op, err)
+    }
+    if !valid {
+        return "", "", fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+    }
+
+    // парсим refresh token чтобы достать uuid
+    token, err := jwt.ParseWithClaims(refreshToken, jwt.MapClaims{},
+        func(token *jwt.Token) (interface{}, error) {
+            if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+                return nil, fmt.Errorf("unexpected signing method")
+            }
+            return []byte(a.jwtSecret), nil
+        },
+    )
+    if err != nil || !token.Valid {
+        return "", "", fmt.Errorf("%s: invalid refresh token", op)
+    }
+
+    claims := token.Claims.(jwt.MapClaims)
+    uuid := claims["uuid"].(string)
+
+    // удаляем старый refresh token
+    if err := a.tokenDeletr.DeleteToken(ctx, refreshToken); err != nil {
+        log.Error("failed to delete old token", sl.Err(err))
+        return "", "", fmt.Errorf("%s: %w", op, err)
+    }
+
+    // генерируем новые токены
+    user := models.User{
+        ID:   uuid,
+        Role: models.RolePlayer,
+    }
+
+    accessToken, newRefreshToken, err := jwtutil.NewTokens(user, a.jwtSecret, a.accessTokenTTL, a.refreshTokenTTL)
+    if err != nil {
+        log.Error("failed to generate tokens", sl.Err(err))
+        return "", "", fmt.Errorf("%s: %w", op, err)
+    }
+
+    // сохраняем новый refresh token
+    if err := a.tokenSaver.SaveToken(ctx, uuid, newRefreshToken, a.refreshTokenTTL); err != nil {
+        log.Error("failed to save token", sl.Err(err))
+        return "", "", fmt.Errorf("%s: %w", op, err)
+    }
+
+    return accessToken, newRefreshToken, nil
+}
+
+

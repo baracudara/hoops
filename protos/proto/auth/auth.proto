@@ -12,7 +12,17 @@ service Auth {
     rpc SendOTP(SendOTPRequest) returns (SendOTPResponse);
     rpc VerifyAccessToken(VerifyAccessTokenRequest) returns (VerifyAccessTokenResponse);
     rpc VerifyRefreshToken(VerifyRefreshTokenRequest) returns (VerifyRefreshTokenResponse);
+    rpc Refresh(RefreshRequest) returns (RefreshResponse);
 
+}
+
+message RefreshRequest {
+    string refresh_token = 1;
+}
+
+message RefreshResponse {
+    string access_token = 1;
+    string refresh_token = 2;
 }
 
 

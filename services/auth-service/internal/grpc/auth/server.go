@@ -19,6 +19,7 @@ type Auth interface {
 	Logout(ctx context.Context, refreshToken string)  error
 	VerifyRefreshToken(ctx context.Context, refreshToken string) (bool, error)
 	VerifyAccessToken(ctx context.Context, accessToken string) (models.User, error)
+    Refresh(ctx context.Context, refreshToken string) (string, string, error)
 }
 
 
@@ -198,4 +199,21 @@ func (s *serverAPI) VerifyAccessToken(ctx context.Context, in *auth.VerifyAccess
         
     }, nil
 
+}
+
+
+func (s *serverAPI) Refresh(ctx context.Context, in *auth.RefreshRequest) (*auth.RefreshResponse, error) {
+    if in.GetRefreshToken() == "" {
+        return nil, status.Error(codes.InvalidArgument, "refresh token is required")
+    }
+
+    accessToken, refreshToken, err := s.authService.Refresh(ctx, in.GetRefreshToken())
+    if err != nil {
+        return nil, status.Error(codes.Internal, "failed to refresh tokens")
+    }
+
+    return &auth.RefreshResponse{
+        AccessToken:  accessToken,
+        RefreshToken: refreshToken,
+    }, nil
 }
