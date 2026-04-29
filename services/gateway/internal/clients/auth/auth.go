@@ -7,6 +7,7 @@ import (
 	"github.com/baracudara/hoops/gateway/internal/config"
 	"github.com/baracudara/hoops/protos/gen/go/auth"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
@@ -14,14 +15,28 @@ type Client struct {
     api auth.AuthClient
 }
 
+
 func New(cfg *config.AuthGRPC) (*Client, error) {
     const op = "clients.auth.New"
 
     addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 
-    conn, err := grpc.NewClient(addr,
-        grpc.WithTransportCredentials(insecure.NewCredentials()),
-    )
+
+    var opts []grpc.DialOption
+
+    if cfg.Secure {
+        creds, err := credentials.NewClientTLSFromFile("cert.pem", "")
+        if err != nil {
+            return nil, fmt.Errorf("failed to load TLS credentials: %w", err)
+        }
+        opts = append(opts, grpc.WithTransportCredentials(creds))
+    } else {
+        opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+    }
+
+    conn, err := grpc.NewClient(addr, opts...)
+
+
     if err != nil {
         return nil, fmt.Errorf("%s: %w", op, err)
     }
@@ -30,6 +45,7 @@ func New(cfg *config.AuthGRPC) (*Client, error) {
         api: auth.NewAuthClient(conn),
     }, nil
 }
+
 
 
 func (c *Client) Register(ctx context.Context, req *auth.RegisterRequest) (*auth.RegisterResponse, error) {

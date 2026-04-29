@@ -1,0 +1,14 @@
+env: local
+
+postgres:
+  host: localhost
+  port: 5432
+  user: root
+  password: qwerty
+  dbname: player
+  min_conns: 2
+  max_conns: 10
+
+grpc:
+  port: 44045
+  timeout: 5s

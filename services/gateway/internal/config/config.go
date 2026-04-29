@@ -25,6 +25,7 @@ type AuthGRPC struct {
 	Host    string        `yaml:"host" env-default:"localhost"`
     Port    int           `yaml:"port" env-default:"44044"`
     Timeout time.Duration `yaml:"timeout" env-default:"5s"`
+	Secure  bool          `yaml:"secure" env-default:"false"`
 }
 
 func MustLoad() *Config {

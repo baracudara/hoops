@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package player;
+
+option go_package = "github.com/baracudara/hoops/protos/gen/go/player;player";
+
+service Player {
+    rpc CreatePlayer(CreatePlayerRequest) returns (CreatePlayerResponse);
+    rpc GetProfile(GetProfileRequest) returns (GetProfileResponse);
+    rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse);
+    rpc GetStats(GetStatsRequest) returns (GetStatsResponse);
+}
+
+
+message CreatePlayerRequest {
+    string uuid = 1;
+    string name = 2;
+    string nickname = 3;
+}
+
+message CreatePlayerResponse {
+    string uuid = 1;
+    string name = 2;
+    string nickname = 3;
+}
+
+
+message GetProfileRequest {
+    string uuid = 1;
+}
+
+message GetProfileResponse {
+    string uuid = 1;
+    string name = 2;
+    string nickname = 3;
+    string position = 4;
+    int32 age = 5;
+}
+
+message UpdateProfileRequest {
+    string uuid = 1;
+    string name = 2;
+    string nickname = 3;
+    string position = 4;
+    int32 age = 5;
+}
+
+message UpdateProfileResponse {
+    bool success = 1;
+}
+
+message GetStatsRequest {
+    string uuid = 1;
+}
+
+message GetStatsResponse {
+    string uuid = 1;
+    int32 games_played = 2;
+    int32 wins = 3;
+    int32 losses = 4;
+}

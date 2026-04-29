@@ -10,3 +10,4 @@ auth_grpc:
   host: localhost
   port: 44044
   timeout: 5s
+  secure: false
