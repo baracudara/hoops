@@ -12,6 +12,7 @@ import (
 	jwtutil "github.com/baracudara/hoops/auth-service/internal/lib/jwt"
 	"github.com/baracudara/hoops/auth-service/internal/lib/logger/sl"
 	"github.com/baracudara/hoops/auth-service/internal/storage"
+	"github.com/baracudara/hoops/protos/gen/go/player"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -28,6 +29,7 @@ type Auth struct {
 	tokenSaver TokenSaver
 	tokenChecker TokenChecker
 	tokenDeletr TokenDeletr
+	playerCreator   PlayerCreator
 	accessTokenTTL time.Duration
 	refreshTokenTTL time.Duration
 	jwtSecret string
@@ -40,6 +42,7 @@ func New(
 	tokenSaver TokenSaver,
 	tokenChecker TokenChecker,
 	tokenDeletr TokenDeletr,
+	playerCreator PlayerCreator,
 	accessTokenTTL time.Duration, 
 	refreshTokenTTL time.Duration, 
 	jwtSecret string,
@@ -51,6 +54,7 @@ func New(
 		tokenSaver: tokenSaver,
 		tokenChecker: tokenChecker,
 		tokenDeletr: tokenDeletr,
+		playerCreator:   playerCreator, 
 		accessTokenTTL: accessTokenTTL,
 		refreshTokenTTL: refreshTokenTTL,
 		jwtSecret: jwtSecret,
@@ -94,6 +98,10 @@ type UserProvider interface {
 		ctx context.Context, 
 		dto dto.Login,
 	) (models.User, error)
+}
+
+type PlayerCreator interface {
+    CreatePlayer(ctx context.Context, req *player.CreatePlayerRequest) (*player.CreatePlayerResponse, error)
 }
 
 func (a *Auth) Login(ctx context.Context, dto dto.Login) (string, string, error) {
@@ -170,6 +178,20 @@ func (a *Auth) Register(ctx context.Context, dto dto.Register) (string, string, 
 	}
 
 	usersql, err := a.usrSaver.SaveUser(ctx, user)
+	if err != nil {
+		log.Error("failed to save user", sl.Err(err))
+		return "", "", fmt.Errorf("%s: %w", op, err)
+	}
+
+
+	_, err = a.playerCreator.CreatePlayer(ctx, &player.CreatePlayerRequest{
+		Uuid:     usersql.ID,
+		Name:     usersql.Name,
+		Nickname: usersql.Nickname,
+	})
+	if err != nil {
+		log.Error("failed to create player profile", sl.Err(err))
+	}
 
 	if err != nil {
 		log.Error("failed to save user", sl.Err(err))

@@ -14,6 +14,7 @@ type Config struct {
 	Redis    `yaml:"redis"`
 	GRPC     `yaml:"grpc"`
 	JWT      `yaml:"jwt"`
+	PlayerGRPC `yaml:"player_grpc"`
 }
 
 
@@ -45,6 +46,14 @@ type JWT struct {
 type GRPC struct {
 	Port    int           `yaml:"port"`
 	Timeout time.Duration `yaml:"timeout"`
+}
+
+
+type PlayerGRPC struct {
+    Host    string        `yaml:"host" env-default:"localhost"`
+    Port    int           `yaml:"port" env-default:"44045"`
+    Secure  bool          `yaml:"secure" env-default:"false"`
+    Timeout time.Duration `yaml:"timeout" env-default:"5s"`
 }
 
 func MustLoad() *Config {

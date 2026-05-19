@@ -8,7 +8,6 @@ import (
 	"github.com/baracudara/hoops/player-service/internal/domain/dto"
 	"github.com/baracudara/hoops/player-service/internal/domain/models"
 	"github.com/baracudara/hoops/player-service/internal/lib/logger/sl"
-	"github.com/google/uuid"
 )
 
 type Player struct {
@@ -50,7 +49,6 @@ func (p *Player) CreatePlayer(ctx context.Context, player models.Player) (models
     log := p.log.With(slog.String("op", op))
     log.Info("creating player")
 
-    player.ID = uuid.New().String()
 
     res, err := p.playerSaver.SavePlayer(ctx, player)
     if err != nil {
