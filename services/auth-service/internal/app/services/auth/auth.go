@@ -100,6 +100,8 @@ type UserProvider interface {
 	) (models.User, error)
 }
 
+
+
 type PlayerCreator interface {
     CreatePlayer(ctx context.Context, req *player.CreatePlayerRequest) (*player.CreatePlayerResponse, error)
 }

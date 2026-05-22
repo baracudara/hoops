@@ -8,7 +8,11 @@ import (
 	"github.com/baracudara/hoops/protos/gen/go/auth"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+
+    
 	"google.golang.org/grpc/credentials/insecure"
+
+
 )
 
 type Client struct {
