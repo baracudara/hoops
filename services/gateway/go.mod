@@ -5,14 +5,19 @@ go 1.25.6
 require (
 	github.com/baracudara/hoops v0.0.0-00010101000000-000000000000
 	github.com/go-chi/chi/v5 v5.2.5
+	github.com/google/uuid v1.6.0
+	github.com/gorilla/websocket v1.5.3
 	github.com/ilyakaznacheev/cleanenv v1.5.0
+	github.com/redis/go-redis/v9 v9.19.0
 	google.golang.org/grpc v1.80.0
 	google.golang.org/protobuf v1.36.11
 )
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
+	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
+	go.uber.org/atomic v1.11.0 // indirect
 	golang.org/x/net v0.49.0 // indirect
 	golang.org/x/sys v0.40.0 // indirect
 	golang.org/x/text v0.33.0 // indirect

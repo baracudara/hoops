@@ -12,6 +12,7 @@ type Config struct {
     Env      string `yaml:"env" env-default:"local"`
     HTTP     `yaml:"http"`
     AuthGRPC `yaml:"auth_grpc"`
+	Redis    `yaml:"redis"`
 }
 
 type HTTP struct {
@@ -26,6 +27,13 @@ type AuthGRPC struct {
     Port    int           `yaml:"port" env-default:"44044"`
     Timeout time.Duration `yaml:"timeout" env-default:"5s"`
 	Secure  bool          `yaml:"secure" env-default:"false"`
+}
+
+type Redis struct {
+    Host     string `yaml:"host" env-default:"localhost"`
+    Port     int    `yaml:"port" env-default:"6379"`
+    Password string `yaml:"password" env-default:""`
+    DB       int    `yaml:"db" env-default:"0"`
 }
 
 func MustLoad() *Config {

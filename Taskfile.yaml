@@ -1,0 +1,36 @@
+version: '3'
+
+tasks:
+  dev:
+    cmds:
+      - task: '{{if eq OS "darwin"}}dev-mac{{else}}dev-win{{end}}'
+
+  dev-mac:
+    deps: [auth-mac, gateway-mac, player-mac]
+
+  dev-win:
+    deps: [auth-win, gateway-win, player-win]
+
+  auth-mac:
+    internal: true
+    cmd: osascript -e 'tell app "Terminal" to do script "cd {{.ROOT_DIR}}/services/auth-service && go run cmd/auth/main.go --config=config/local.yaml"'
+
+  gateway-mac:
+    internal: true
+    cmd: osascript -e 'tell app "Terminal" to do script "cd {{.ROOT_DIR}}/services/gateway && go run cmd/main.go --config=config/local.yaml"'
+
+  player-mac:
+    internal: true
+    cmd: osascript -e 'tell app "Terminal" to do script "cd {{.ROOT_DIR}}/services/player-service && go run cmd/main.go --config=config/local.yaml"'
+
+  auth-win:
+    internal: true
+    cmd: powershell -Command "Start-Process powershell -ArgumentList '-NoExit', '-Command', 'cd D:\Projects\golang\hoops\services\auth-service; go run cmd/auth/main.go --config=config/local.yaml'"
+
+  gateway-win:
+    internal: true
+    cmd: powershell -Command "Start-Process powershell -ArgumentList '-NoExit', '-Command', 'cd D:\Projects\golang\hoops\services\gateway; go run cmd/main.go --config=config/local.yaml'"
+
+  player-win:
+    internal: true
+    cmd: powershell -Command "Start-Process powershell -ArgumentList '-NoExit', '-Command', 'cd D:\Projects\golang\hoops\services\player-service; go run cmd/main.go --config=config/local.yaml'"
